@@ -1,13 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X } from "lucide-react";
+import { Leaf, Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     element?.scrollIntoView({ behavior: 'smooth' });
+    setIsMenuOpen(false);
+  };
+
+  const handleAuthAction = () => {
+    if (user) {
+      signOut();
+    } else {
+      navigate('/auth');
+    }
     setIsMenuOpen(false);
   };
 
@@ -43,9 +56,22 @@ const Navigation = () => {
             >
               Dashboard
             </button>
-            <Button size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-muted-foreground">
+                  Welcome back!
+                </span>
+                <Button size="sm" variant="outline" onClick={handleAuthAction}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button size="sm" onClick={handleAuthAction}>
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -79,9 +105,17 @@ const Navigation = () => {
               >
                 Dashboard
               </button>
-              <Button size="sm" className="w-fit">
-                Get Started
-              </Button>
+              {user ? (
+                <Button size="sm" variant="outline" className="w-fit" onClick={handleAuthAction}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              ) : (
+                <Button size="sm" className="w-fit" onClick={handleAuthAction}>
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         )}
